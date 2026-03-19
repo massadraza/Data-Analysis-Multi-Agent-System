@@ -19,31 +19,41 @@ A production-ready end-to-end machine learning system for Iris flower classifica
 flowchart TB
     subgraph Training["Training Pipeline (offline)"]
         direction LR
-        A[(Iris Dataset)] --> B[preprocessing.py\nStandardScaler\n80/20 split]
-        B --> C[trainer.py\nRandomForestClassifier\nn_estimators=100]
-        C --> D[metrics.py\nAccuracy · Report\nConfusion Matrix]
-        C --> E[(artifacts/\nmodel.pkl)]
-        D --> F[(artifacts/\nmetrics.json)]
+        A[(Iris Dataset)] --> B["preprocessing.py
+StandardScaler · 80/20 split"]
+        B --> C["trainer.py
+RandomForestClassifier
+n_estimators=100"]
+        C --> D["metrics.py
+Accuracy · Report · Confusion Matrix"]
+        C --> E[(model.pkl)]
+        D --> F[(metrics.json)]
     end
 
     subgraph Docker["Docker Compose"]
         direction TB
         subgraph API["FastAPI  :8000"]
-            G[model_loader.py\nsingleton] --> H[/predict\nPOST]
-            G --> I[/metrics\nGET]
-            J[/health\nGET]
+            G["model_loader.py
+singleton"] --> H["POST /predict"]
+            G --> I["GET /metrics"]
+            J["GET /health"]
         end
         subgraph UI["Streamlit  :8501"]
-            K[Prediction Page\nfeature sliders]
-            L[Metrics Page\naccuracy · heatmap]
+            K["Prediction Page
+feature sliders"]
+            L["Metrics Page
+accuracy · heatmap"]
         end
         K -- "POST /predict" --> H
         L -- "GET /metrics"  --> I
     end
 
     subgraph CI["GitHub Actions CI"]
-        M[Lint\nruff] --> N[Test\npytest 35 tests]
-        N --> O[Build\ndocker build]
+        M["Lint
+ruff"] --> N["Test
+pytest · 35 tests"]
+        N --> O["Build
+docker build"]
     end
 
     E --> G
